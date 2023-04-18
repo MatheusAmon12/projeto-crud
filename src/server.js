@@ -1,18 +1,13 @@
 const express = require('express')
-const mongoose = require('mongoose')
 const path = require('path')
+
+const db = require('./database')//busca pelo arquivo automaticamente
+const routes = require('./routes')
 
 const app = express()
 
-mongoose.connect('mongodb://127.0.0.1/')
-
-const db = mongoose.connection
-
-db.once('open', () => {
-    console.log('Connected to database!')
-})
-
-db.on('error', console.error.bind(console, 'connection error: '))
+//conectando ao banco de dados
+db.connect()
 
 //definindo template engine
 app.set('view engine', 'ejs')
@@ -24,12 +19,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 //habilitando server para receber dados via post (form)
 app.use(express.urlencoded({extended: true}))
 
-//rotas
-app.get('/', (req, res) => {
-    res.render('index', {
-        title: 'Titulo de teste'
-    })
-})
+//definindo rotas
+app.use('/', routes)
 
 //error 404 - not found
 app.use((req, res) => {//middleware
